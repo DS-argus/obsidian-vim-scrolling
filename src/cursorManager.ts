@@ -43,7 +43,7 @@ export class CursorManager {
 
 	private adjustCursorAfterModeSwitch(view: MarkdownView): void {
 		// Defer so the editor has time to fully initialize and render
-		setTimeout(() => {
+		activeWindow.setTimeout(() => {
 			const editor = view.editor as EditorWithCM;
 			if (!editor?.cm) return;
 

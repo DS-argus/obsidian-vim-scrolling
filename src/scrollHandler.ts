@@ -13,7 +13,7 @@ export class ReadingModeScrollHandler {
 	}
 
 	register(): void {
-		this.plugin.registerDomEvent(document, 'keydown', (evt: KeyboardEvent) => {
+		this.plugin.registerDomEvent(activeDocument, 'keydown', (evt: KeyboardEvent) => {
 			this.handleKeyDown(evt);
 		});
 	}
@@ -86,7 +86,7 @@ export class ReadingModeScrollHandler {
 		// Yield to Obsidian modals, prompts, and suggestion dropdowns
 		if (target.closest('.modal-container, .prompt, .suggestion-container')) return true;
 		// Yield if any modal overlay is currently visible in the DOM
-		if (document.querySelector('.modal-container')) return true;
+		if (activeDocument.querySelector('.modal-container')) return true;
 		return false;
 	}
 

@@ -1,8 +1,28 @@
-/*
+/* Link hint mode (Vimium-style `f`) */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.vim-scroll-hint {
+	position: fixed;
+	z-index: var(--layer-popover, 30);
+	padding: 0 4px;
+	font-family: var(--font-monospace);
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.4;
+	color: var(--text-on-accent);
+	background-color: var(--interactive-accent);
+	border-radius: 4px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+	pointer-events: none;
+	transform: translateY(-50%);
+}
 
-If your plugin does not need CSS, delete this file.
+.vim-scroll-hint-inactive {
+	opacity: 0.3;
+}
 
-*/
+/* Highlight applied to a focused link */
+.vim-scroll-link-focused {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+	border-radius: 2px;
+}

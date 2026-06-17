@@ -20,6 +20,9 @@ It also handles a common friction point: after scrolling in reading mode, switch
 | `Ctrl+U` | Scroll up half a page |
 | `gg` | Scroll to the top of the document |
 | `G` | Scroll to the bottom of the document |
+| `f` | Enter link hint mode — label every visible link |
+
+In link hint mode, type a hint label to **focus** that link (internal links also show Obsidian's hover preview). With a link focused, press `Enter` to follow it — internal links open the note, external links open the URL. Press `Esc` to cancel.
 
 Keys are only active when:
 1. The current view is in **reading mode** (preview)
@@ -36,6 +39,15 @@ Scrolling is instant — `scrollTop` is set directly with no CSS smooth-scroll o
 ### Repeated Key Strokes
 
 Holding a key (e.g., `j`) produces repeated `keydown` events. Each event is handled independently — no debouncing or rate-limiting is applied — so the viewport scrolls smoothly as long as the key is held.
+
+### Link Hint Mode
+
+Pressing `f` enumerates every link currently visible in the viewport and overlays a short hint label on each (Vimium-style). Typing a label focuses the link rather than opening it immediately:
+
+- **Internal links** → the link is highlighted, scrolled into view, and Obsidian's page preview popover is shown (requires the **Page Preview** core plugin).
+- **External links** → the link is highlighted and scrolled into view.
+
+With a link focused, `Enter` activates it — internal links navigate via `openLinkText`, external links open in a new window. `Esc` clears the focus. Hints are dismissed automatically if you scroll, resize, switch panes, or toggle out of reading mode.
 
 ### `gg` Detection
 

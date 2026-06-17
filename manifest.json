@@ -2,8 +2,8 @@
 	"id": "vim-scrolling",
 	"name": "Vim Scrolling",
 	"version": "1.0.1",
-	"minAppVersion": "0.15.0",
-	"description": "Adds vim-style scrolling (j/k, Ctrl+D/U, gg, G) in reading mode when vim key bindings are enabled.",
+	"minAppVersion": "1.1.0",
+	"description": "Adds vim-style scrolling (j/k, Ctrl+D/U, gg, G) and Vimium-style link hints (f) in reading mode when vim key bindings are enabled.",
 	"author": "xlongfeng",
 	"isDesktopOnly": false
 }

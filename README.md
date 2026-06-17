@@ -16,8 +16,8 @@ It also handles a common friction point: after scrolling in reading mode, switch
 |-----|--------|
 | `j` | Scroll down one line |
 | `k` | Scroll up one line |
-| `Ctrl+D` | Scroll down half a page |
-| `Ctrl+U` | Scroll up half a page |
+| `Ctrl+D` / `d` | Scroll down half a page |
+| `Ctrl+U` / `u` | Scroll up half a page |
 | `gg` | Scroll to the top of the document |
 | `G` | Scroll to the bottom of the document |
 | `f` | Enter link hint mode — label every visible link |

@@ -44,6 +44,14 @@ export class ReadingModeScrollHandler {
 					evt.preventDefault();
 					scrollEl.scrollTop -= this.getLineHeight(scrollEl);
 					break;
+				case 'd':
+					evt.preventDefault();
+					this.scrollHalfPage(scrollEl, 1);
+					break;
+				case 'u':
+					evt.preventDefault();
+					this.scrollHalfPage(scrollEl, -1);
+					break;
 				case 'g': {
 					evt.preventDefault();
 					const now = Date.now();
@@ -64,14 +72,18 @@ export class ReadingModeScrollHandler {
 			switch (key) {
 				case 'd':
 					evt.preventDefault();
-					scrollEl.scrollTop += scrollEl.clientHeight / 2;
+					this.scrollHalfPage(scrollEl, 1);
 					break;
 				case 'u':
 					evt.preventDefault();
-					scrollEl.scrollTop -= scrollEl.clientHeight / 2;
+					this.scrollHalfPage(scrollEl, -1);
 					break;
 			}
 		}
+	}
+
+	private scrollHalfPage(scrollEl: HTMLElement, direction: 1 | -1): void {
+		scrollEl.scrollTop += direction * (scrollEl.clientHeight / 2);
 	}
 
 	private isFocusInModal(evt: KeyboardEvent): boolean {

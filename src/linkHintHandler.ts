@@ -2,7 +2,7 @@ import { MarkdownView, Plugin } from 'obsidian';
 import { VaultWithConfig } from './types';
 
 const HINT_CHARS = 'asdfghjklqwertyuiopzxcvbnm';
-const HOVER_LINK_SOURCE = 'vim-scrolling';
+const HOVER_LINK_SOURCE = 'vim-reading-nav';
 
 interface Hint {
 	label: string;
@@ -36,7 +36,7 @@ export class LinkHintHandler {
 		// Register as a hover source so the Page Preview core plugin shows
 		// popovers for hover-link events triggered by this plugin.
 		this.plugin.registerHoverLinkSource(HOVER_LINK_SOURCE, {
-			display: 'Vim Scrolling',
+			display: 'Vim Reading Navigation',
 			defaultMod: false,
 		});
 

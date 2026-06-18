@@ -1,6 +1,8 @@
-# Obsidian Vim Scrolling
+# Vim Reading Navigation
 
-An Obsidian plugin that adds vim-style scrolling in **reading mode** when Obsidian's vim key bindings are enabled.
+An Obsidian plugin that brings vim-style **scrolling** and [Vimium](https://github.com/philc/vimium)-style **link hints** to **reading mode** when Obsidian's vim key bindings are enabled.
+
+> A personal fork of [xlongfeng/obsidian-vim-scrolling](https://github.com/xlongfeng/obsidian-vim-scrolling) that adds plain `d`/`u` half-page scrolling and an `f` link hint mode. Not published to the community store — see [Installation](#installation-build-from-source) and [Credits](#credits).
 
 ## Design Idea
 
@@ -12,19 +14,20 @@ It also handles a common friction point: after scrolling in reading mode, switch
 
 ## Key Mappings
 
-| Key | Action |
-|-----|--------|
-| `j` | Scroll down one line |
-| `k` | Scroll up one line |
-| `Ctrl+D` / `d` | Scroll down half a page |
-| `Ctrl+U` / `u` | Scroll up half a page |
-| `gg` | Scroll to the top of the document |
-| `G` | Scroll to the bottom of the document |
-| `f` | Enter link hint mode — label every visible link |
+| Key            | Action                                          |
+| -------------- | ----------------------------------------------- |
+| `j`            | Scroll down one line                            |
+| `k`            | Scroll up one line                              |
+| `Ctrl+D` / `d` | Scroll down half a page                         |
+| `Ctrl+U` / `u` | Scroll up half a page                           |
+| `gg`           | Scroll to the top of the document               |
+| `G`            | Scroll to the bottom of the document            |
+| `f`            | Enter link hint mode — label every visible link |
 
 In link hint mode, type a hint label to **focus** that link (internal links also show Obsidian's hover preview). With a link focused, press `Enter` to follow it — internal links open the note, external links open the URL. Press `Esc` to cancel.
 
 Keys are only active when:
+
 1. The current view is in **reading mode** (preview)
 2. Obsidian's **vim mode** is enabled (Settings → Editor → Vim key bindings)
 
@@ -33,6 +36,7 @@ Keys are only active when:
 ### No Animation
 
 Scrolling is instant — `scrollTop` is set directly with no CSS smooth-scroll or animation. This is intentional:
+
 - Key-repeat events (holding `j` or `k`) scroll continuously without animation queuing lag.
 - The behaviour matches source mode vim motions, which are also instantaneous.
 
@@ -42,7 +46,7 @@ Holding a key (e.g., `j`) produces repeated `keydown` events. Each event is hand
 
 ### Link Hint Mode
 
-Pressing `f` enumerates every link currently visible in the viewport and overlays a short hint label on each (Vimium-style). Typing a label focuses the link rather than opening it immediately:
+Pressing `f` enumerates every link currently visible in the viewport and overlays a short hint label on each — recreating the feel of the [Vimium](https://github.com/philc/vimium) browser extension for Chrome, where you press a key, every link gets a label, and you type the label to jump. Typing a label focuses the link rather than opening it immediately:
 
 - **Internal links** → the link is highlighted, scrolled into view, and Obsidian's page preview popover is shown (requires the **Page Preview** core plugin).
 - **External links** → the link is highlighted and scrolled into view.
@@ -69,20 +73,60 @@ This ensures the editor opens with the cursor near the content you were reading.
 3. Open any note and switch to **Reading mode** (the book icon in the top-right, or via the command palette).
 4. Use `j`/`k`, `Ctrl+D`/`Ctrl+U`, `gg`, and `G` to navigate.
 
-## Installation
+## Installation (build from source)
 
-### Manual
+This is a personal fork and is **not** published to the Obsidian community store, so install it by building locally and copying the output into your vault.
 
-1. Download `main.js` and `manifest.json` from the [latest release](../../releases/latest).
-2. Copy them to `<Vault>/.obsidian/plugins/vim-scrolling/`.
-3. Reload Obsidian and enable the plugin under **Settings → Community plugins**.
+### Prerequisites
 
-### Development
+- [Node.js](https://nodejs.org) 18+ and npm
+
+### 1. Build
 
 ```bash
-git clone https://github.com/xlongfeng/obsidian-vim-scrolling vim-scrolling
-cd vim-scrolling
+git clone https://github.com/DS-argus/obsidian-vim-scrolling vim-reading-nav
+cd vim-reading-nav
 npm install
-npm run dev   # watch mode — compiles src/main.ts → main.js
+npm run build        # type-checks, then bundles src/ → main.js
 ```
 
+This produces `main.js` at the repo root. The three files Obsidian needs are `main.js`, `manifest.json`, and `styles.css`.
+
+### 2. Copy into your vault
+
+Create the plugin folder if it doesn't exist, then copy the three artifacts in.
+
+**macOS / Linux:**
+
+```bash
+cp main.js manifest.json styles.css "<Vault>/.obsidian/plugins/vim-reading-nav/"
+```
+
+**Windows (PowerShell):**
+
+```ps1
+Copy-Item main.js,manifest.json,styles.css "<Vault>\.obsidian\plugins\vim-reading-nav\"
+```
+
+> `.obsidian` is a hidden folder. The plugin folder name must match the plugin `id` (`vim-reading-nav`).
+
+### 3. Enable
+
+Reload Obsidian (`Reload app without saving` from the command palette), then enable **Vim Reading Navigation** under **Settings → Community plugins**.
+
+### Live development
+
+```bash
+npm run dev   # watch mode — recompiles main.js on save
+```
+
+Re-copy `main.js` into the vault and reload Obsidian after each change, or point esbuild's output (`esbuild.config.mjs`) directly at your vault's plugin folder to skip the copy step.
+
+## Credits
+
+A fork of [**obsidian-vim-scrolling**](https://github.com/xlongfeng/obsidian-vim-scrolling) by [xlongfeng](https://github.com/xlongfeng). The original provides the reading-mode scrolling and cursor-adjustment behaviour; this fork adds:
+
+- Plain `d` / `u` for half-page scrolling (alongside `Ctrl+D` / `Ctrl+U`)
+- An `f` Vimium-style link hint mode with hover preview and link activation
+
+Distributed under the same [0BSD license](LICENSE) as the original.

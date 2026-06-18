@@ -1,4 +1,4 @@
-# Contributing to Obsidian Vim Scrolling
+# Contributing to Vim Reading Navigation
 
 Thank you for considering contributing! This document covers everything you need to get started.
 
@@ -11,8 +11,8 @@ Thank you for considering contributing! This document covers everything you need
 ## Setting up the development environment
 
 ```bash
-git clone https://github.com/xlongfeng/obsidian-vim-scrolling vim-scrolling
-cd vim-scrolling
+git clone https://github.com/DS-argus/obsidian-vim-scrolling vim-reading-nav
+cd vim-reading-nav
 npm install
 ```
 
@@ -47,8 +47,9 @@ Uses ESLint with [`eslint-plugin-obsidianmd`](https://github.com/obsidianmd/esli
 ```
 src/
   main.ts          # Plugin entry point — lifecycle only (onload, onunload)
-  scrollHandler.ts # Keydown listener and vim scroll commands for reading mode
-  cursorManager.ts # Cursor correction when switching reading → source mode
+  scrollHandler.ts   # Keydown listener and vim scroll commands for reading mode
+  linkHintHandler.ts # Vimium-style link hint mode (f) with hover preview
+  cursorManager.ts   # Cursor correction when switching reading → source mode
   settings.ts      # Settings interface, defaults, and SettingTab
   types.ts         # Shared TypeScript interfaces
 esbuild.config.mjs # Bundle configuration
@@ -62,12 +63,12 @@ versions.json      # Plugin version → minimum Obsidian version map
 1. Run `npm run dev` to start watch mode.
 2. Copy (or symlink) the plugin folder into your vault:
    ```
-   <Vault>/.obsidian/plugins/vim-scrolling/
+   <Vault>/.obsidian/plugins/vim-reading-nav/
    ```
    The folder must contain `main.js`, `manifest.json`, and `styles.css`.
-3. In Obsidian, enable **Settings → Community plugins → Vim Scrolling**.
+3. In Obsidian, enable **Settings → Community plugins → Vim Reading Navigation**.
 4. Enable **Settings → Editor → Vim key bindings**.
-5. Open a note in **Reading mode** and exercise the key mappings (`j`, `k`, `Ctrl+D`, `Ctrl+U`, `gg`, `G`).
+5. Open a note in **Reading mode** and exercise the key mappings (`j`, `k`, `d`/`Ctrl+D`, `u`/`Ctrl+U`, `gg`, `G`, `f`).
 
 ## Coding conventions
 

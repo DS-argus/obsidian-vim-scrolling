@@ -1,11 +1,11 @@
 {
-	"name": "vim-scrolling",
+	"name": "vim-reading-nav",
 	"version": "1.0.1",
-	"description": "Adds vim-style scrolling (j/k, Ctrl+D/U, gg, G) in reading mode when vim key bindings are enabled.",
+	"description": "Adds vim-style scrolling (j/k, Ctrl+D/U or d/u, gg, G) and Vimium-style link hints (f) in reading mode when vim key bindings are enabled.",
 	"main": "main.js",
 	"type": "module",
-	"author": "xlongfeng",
-	"homepage": "https://github.com/xlongfeng/obsidian-vim-scrolling",
+	"author": "argus",
+	"homepage": "https://github.com/DS-argus/obsidian-vim-scrolling",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",

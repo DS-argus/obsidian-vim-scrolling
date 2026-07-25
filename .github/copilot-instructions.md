@@ -19,7 +19,7 @@ This is an **Obsidian community plugin** built with TypeScript + esbuild.
 - **Entry point**: `src/main.ts` — exports a default class extending `Plugin`. This is the only file esbuild uses as an entry point.
 - **Output**: `main.js` at the repo root (CJS format, ES2018 target). This file, along with `manifest.json` and `styles.css`, is what Obsidian loads.
 - **Source**: all TypeScript lives under `src/`. `tsconfig.json` sets `baseUrl: "src"`, so imports within `src/` resolve relative to that directory.
-- **Settings**: `src/settings.ts` holds the settings interface, `DEFAULT_SETTINGS` constant, and the `PluginSettingTab` subclass. `main.ts` imports and wires them up.
+- **Settings**: the plugin currently has no settings. If settings are added, create `src/settings.ts` with the settings interface, `DEFAULT_SETTINGS` constant, and the `PluginSettingTab` subclass, and wire them up in `main.ts`.
 
 ### esbuild externals
 

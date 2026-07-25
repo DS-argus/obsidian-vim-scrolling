@@ -50,7 +50,7 @@ src/
   scrollHandler.ts   # Keydown listener and vim scroll commands for reading mode
   linkHintHandler.ts # Vimium-style link hint mode (f) with hover preview
   cursorManager.ts   # Cursor correction when switching reading → source mode
-  settings.ts      # Settings interface, defaults, and SettingTab
+  viewUtils.ts     # Shared guards/lookups (modal focus, vim mode, scroll element)
   types.ts         # Shared TypeScript interfaces
 esbuild.config.mjs # Bundle configuration
 eslint.config.mts  # Lint configuration

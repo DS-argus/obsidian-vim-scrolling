@@ -53,6 +53,9 @@ Pressing `f` enumerates every link currently visible in the viewport and overlay
 
 With a link focused, `Enter` activates it — internal links navigate via `openLinkText`, external links open in a new window. `Esc` clears the focus. Hints are dismissed automatically if you scroll, resize, switch panes, or toggle out of reading mode.
 
+> [!NOTE]
+> The hover preview's lifetime is controlled by the **Page Preview** core plugin, which re-evaluates hover state from the *physical* mouse pointer. If the pointer is stationary the popover stays open; any mouse movement (or content shifting under the pointer after the focus scroll) makes Page Preview notice the link is not actually hovered and dismiss it. This is core-plugin behavior, not something this plugin controls. If you want pinnable, persistent previews, the [Hover Editor](https://github.com/nothingislost/obsidian-hover-editor) plugin works well alongside this one.
+
 ### `gg` Detection
 
 The `gg` command is triggered by pressing `g` twice within **500 ms**. After the first `g`, the timer starts. If a second `g` arrives within the window, the view scrolls to the top.

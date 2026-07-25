@@ -1,5 +1,5 @@
 import { MarkdownView, Plugin } from 'obsidian';
-import { VaultWithConfig } from './types';
+import { getPreviewViewIn, getScrollElement, isFocusInModal, isVimModeEnabled } from './viewUtils';
 
 const HINT_CHARS = 'asdfghjklqwertyuiopzxcvbnm';
 const HOVER_LINK_SOURCE = 'vim-reading-nav';
@@ -23,6 +23,8 @@ export class LinkHintHandler {
 	private hints: Hint[] = [];
 	private typed = '';
 	private active = false;
+	/** Document the current hint overlays live in (main or pop-out window). */
+	private hintDoc: Document | null = null;
 	private focusedLink: HTMLAnchorElement | null = null;
 	// Reused across hover-link triggers so the Page Preview plugin can dedupe
 	// and replace the previous popover instead of stacking new ones.
@@ -32,29 +34,13 @@ export class LinkHintHandler {
 		this.plugin = plugin;
 	}
 
+	/** One-time registration of window-independent hooks. */
 	register(): void {
 		// Register as a hover source so the Page Preview core plugin shows
 		// popovers for hover-link events triggered by this plugin.
 		this.plugin.registerHoverLinkSource(HOVER_LINK_SOURCE, {
 			display: 'Vim Reading Navigation',
 			defaultMod: false,
-		});
-
-		this.plugin.registerDomEvent(activeDocument, 'keydown', (evt: KeyboardEvent) => {
-			this.handleKeyDown(evt);
-		});
-
-		// Dismiss hints when the document scrolls or the window resizes — the
-		// fixed-position overlays would otherwise drift away from their links.
-		// scroll doesn't bubble, so listen in the capture phase.
-		this.plugin.registerDomEvent(
-			activeDocument,
-			'scroll',
-			() => { if (this.active) this.exitHintMode(); },
-			{ capture: true }
-		);
-		this.plugin.registerDomEvent(activeWindow, 'resize', () => {
-			if (this.active) this.exitHintMode();
 		});
 
 		// Reset transient state when the user switches panes or toggles between
@@ -67,18 +53,46 @@ export class LinkHintHandler {
 		);
 	}
 
+	/** Attach DOM listeners to one document (main window or pop-out). */
+	registerTo(doc: Document): void {
+		this.plugin.registerDomEvent(doc, 'keydown', (evt: KeyboardEvent) => {
+			this.handleKeyDown(evt, doc);
+		});
+
+		// Dismiss hints when the document scrolls or the window resizes — the
+		// fixed-position overlays would otherwise drift away from their links.
+		// scroll doesn't bubble, so listen in the capture phase.
+		this.plugin.registerDomEvent(
+			doc,
+			'scroll',
+			() => { if (this.active) this.exitHintMode(); },
+			{ capture: true }
+		);
+		const win = doc.defaultView;
+		if (win) {
+			this.plugin.registerDomEvent(win, 'resize', () => {
+				if (this.active) this.exitHintMode();
+			});
+		}
+	}
+
 	/** Tear down all transient state (hints + focus). Safe to call any time. */
 	cleanup(): void {
 		this.exitHintMode();
 		this.clearFocus();
 	}
 
-	private handleKeyDown(evt: KeyboardEvent): void {
+	private handleKeyDown(evt: KeyboardEvent, doc: Document): void {
 		// Don't intercept keys when a modal/dialog is open or focus is in an input
-		if (this.isFocusInModal(evt)) return;
+		if (isFocusInModal(evt, doc)) return;
 
-		// While hint mode is active, every key drives hint selection
+		// While hint mode is active, every key in the hint window drives hint
+		// selection. Keys from any other window just dismiss hint mode.
 		if (this.active) {
+			if (doc !== this.hintDoc) {
+				this.exitHintMode();
+				return;
+			}
 			this.handleHintKey(evt);
 			return;
 		}
@@ -101,9 +115,9 @@ export class LinkHintHandler {
 			}
 		}
 
-		const view = this.getActivePreviewView();
+		const view = getPreviewViewIn(this.plugin.app, doc);
 		if (!view) return;
-		if (!this.isVimModeEnabled()) return;
+		if (!isVimModeEnabled(this.plugin.app)) return;
 
 		const { key, ctrlKey, metaKey, altKey } = evt;
 		if (ctrlKey || metaKey || altKey) return;
@@ -119,25 +133,35 @@ export class LinkHintHandler {
 		this.clearFocus();
 		this.exitHintMode();
 
-		const scrollEl = this.getScrollElement(view);
+		const scrollEl = getScrollElement(view);
 		if (!scrollEl) return;
 
 		const links = this.getVisibleLinks(scrollEl);
 		if (links.length === 0) return;
 
+		const doc = view.containerEl.ownerDocument;
 		const labels = this.generateLabels(links.length);
 		this.active = true;
+		this.hintDoc = doc;
 		this.typed = '';
 
 		links.forEach((link, i) => {
 			const label = labels[i];
 			if (!label) return;
-			const el = this.createHintEl(label, link);
+			const el = this.createHintEl(label, link, doc);
 			this.hints.push({ label, link, el });
 		});
 	}
 
 	private handleHintKey(evt: KeyboardEvent): void {
+		// Let global hotkeys (Ctrl/Cmd/Alt combos like the command palette)
+		// pass through instead of swallowing them. Leaving hint mode avoids
+		// stale overlays behind whatever UI the hotkey opens.
+		if (evt.ctrlKey || evt.metaKey || evt.altKey) {
+			this.exitHintMode();
+			return;
+		}
+
 		evt.preventDefault();
 		evt.stopImmediatePropagation();
 
@@ -176,7 +200,7 @@ export class LinkHintHandler {
 
 	private updateHintDisplay(): void {
 		this.hints.forEach((h) => {
-			h.el.toggleClass('vim-scroll-hint-inactive', !h.label.startsWith(this.typed));
+			h.el.toggleClass('vim-reading-nav-hint-inactive', !h.label.startsWith(this.typed));
 		});
 	}
 
@@ -185,11 +209,12 @@ export class LinkHintHandler {
 		this.hints = [];
 		this.typed = '';
 		this.active = false;
+		this.hintDoc = null;
 	}
 
 	private focusLink(link: HTMLAnchorElement): void {
 		this.focusedLink = link;
-		link.addClass('vim-scroll-link-focused');
+		link.addClass('vim-reading-nav-link-focused');
 		// behavior: 'auto' defeats any inherited smooth-scroll so the jump stays
 		// instant, matching the scroll handler's direct scrollTop assignments.
 		link.scrollIntoView({ block: 'center', behavior: 'auto' });
@@ -200,7 +225,7 @@ export class LinkHintHandler {
 
 	private clearFocus(): void {
 		if (this.focusedLink) {
-			this.focusedLink.removeClass('vim-scroll-link-focused');
+			this.focusedLink.removeClass('vim-reading-nav-link-focused');
 			this.focusedLink = null;
 		}
 	}
@@ -234,7 +259,10 @@ export class LinkHintHandler {
 		}
 
 		const href = link.getAttribute('href');
-		if (href) activeWindow.open(href, '_blank');
+		if (href) {
+			// Open from the link's own window so this works in pop-outs too.
+			(link.ownerDocument.defaultView ?? window).open(href, '_blank');
+		}
 	}
 
 	private getSourcePath(): string {
@@ -259,14 +287,16 @@ export class LinkHintHandler {
 		});
 	}
 
-	private createHintEl(label: string, link: HTMLAnchorElement): HTMLElement {
+	private createHintEl(label: string, link: HTMLAnchorElement, doc: Document): HTMLElement {
 		const rect = link.getBoundingClientRect();
-		const el = activeDocument.body.createDiv({
-			cls: 'vim-scroll-hint',
+		const el = doc.body.createDiv({
+			cls: 'vim-reading-nav-hint',
 			text: label.toUpperCase(),
 		});
-		el.style.left = `${rect.left}px`;
-		el.style.top = `${rect.top + rect.height / 2}px`;
+		el.setCssStyles({
+			left: `${rect.left}px`,
+			top: `${rect.top + rect.height / 2}px`,
+		});
 		return el;
 	}
 
@@ -289,35 +319,5 @@ export class LinkHintHandler {
 			}
 		}
 		return labels;
-	}
-
-	private getActivePreviewView(): MarkdownView | null {
-		const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-		if (!view || view.getMode() !== 'preview') return null;
-		return view;
-	}
-
-	private getScrollElement(view: MarkdownView): HTMLElement | null {
-		return view.containerEl.querySelector<HTMLElement>('.markdown-preview-view');
-	}
-
-	private isVimModeEnabled(): boolean {
-		return (this.plugin.app.vault as VaultWithConfig).getConfig('vimMode') === true;
-	}
-
-	private isFocusInModal(evt: KeyboardEvent): boolean {
-		const target = evt.target as HTMLElement;
-		// Yield to any focused input-like element
-		if (
-			target.tagName === 'INPUT' ||
-			target.tagName === 'TEXTAREA' ||
-			target.tagName === 'SELECT' ||
-			target.isContentEditable
-		) return true;
-		// Yield to Obsidian modals, prompts, and suggestion dropdowns
-		if (target.closest('.modal-container, .prompt, .suggestion-container')) return true;
-		// Yield if any modal overlay is currently visible in the DOM
-		if (activeDocument.querySelector('.modal-container')) return true;
-		return false;
 	}
 }

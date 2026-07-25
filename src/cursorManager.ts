@@ -4,6 +4,8 @@ import { CMEditorView, EditorWithCM } from './types';
 export class CursorManager {
 	private plugin: Plugin;
 	private previousMode: string | null = null;
+	private pendingWin: Window | null = null;
+	private pendingTimeout: number | null = null;
 
 	constructor(plugin: Plugin) {
 		this.plugin = plugin;
@@ -23,6 +25,9 @@ export class CursorManager {
 				this.onLayoutChange();
 			})
 		);
+
+		// Cancel any in-flight cursor adjustment when the plugin unloads.
+		this.plugin.register(() => this.cancelPending());
 	}
 
 	private onLayoutChange(): void {
@@ -41,9 +46,25 @@ export class CursorManager {
 		this.previousMode = currentMode;
 	}
 
+	private cancelPending(): void {
+		if (this.pendingTimeout !== null && this.pendingWin) {
+			this.pendingWin.clearTimeout(this.pendingTimeout);
+		}
+		this.pendingTimeout = null;
+		this.pendingWin = null;
+	}
+
 	private adjustCursorAfterModeSwitch(view: MarkdownView): void {
+		// Use the window the view actually lives in (main or pop-out).
+		const win = view.containerEl.ownerDocument.defaultView ?? window;
+
 		// Defer so the editor has time to fully initialize and render
-		activeWindow.setTimeout(() => {
+		this.cancelPending();
+		this.pendingWin = win;
+		this.pendingTimeout = win.setTimeout(() => {
+			this.pendingTimeout = null;
+			this.pendingWin = null;
+
 			const editor = view.editor as EditorWithCM;
 			if (!editor?.cm) return;
 

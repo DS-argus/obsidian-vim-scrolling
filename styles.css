@@ -1,6 +1,6 @@
 /* Link hint mode (Vimium-style `f`) */
 
-.vim-scroll-hint {
+.vim-reading-nav-hint {
 	position: fixed;
 	z-index: var(--layer-popover, 30);
 	padding: 0 4px;
@@ -16,12 +16,12 @@
 	transform: translateY(-50%);
 }
 
-.vim-scroll-hint-inactive {
+.vim-reading-nav-hint-inactive {
 	opacity: 0.3;
 }
 
 /* Highlight applied to a focused link */
-.vim-scroll-link-focused {
+.vim-reading-nav-link-focused {
 	outline: 2px solid var(--interactive-accent);
 	outline-offset: 2px;
 	border-radius: 2px;

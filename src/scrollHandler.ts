@@ -1,5 +1,5 @@
-import { MarkdownView, Plugin } from 'obsidian';
-import { VaultWithConfig } from './types';
+import { Plugin } from 'obsidian';
+import { getPreviewViewIn, getScrollElement, isFocusInModal, isVimModeEnabled } from './viewUtils';
 
 const DOUBLE_G_TIMEOUT_MS = 500;
 const FALLBACK_LINE_HEIGHT_PX = 24;
@@ -12,21 +12,22 @@ export class ReadingModeScrollHandler {
 		this.plugin = plugin;
 	}
 
-	register(): void {
-		this.plugin.registerDomEvent(activeDocument, 'keydown', (evt: KeyboardEvent) => {
-			this.handleKeyDown(evt);
+	/** Attach the keydown listener to one document (main window or pop-out). */
+	registerTo(doc: Document): void {
+		this.plugin.registerDomEvent(doc, 'keydown', (evt: KeyboardEvent) => {
+			this.handleKeyDown(evt, doc);
 		});
 	}
 
-	private handleKeyDown(evt: KeyboardEvent): void {
+	private handleKeyDown(evt: KeyboardEvent, doc: Document): void {
 		// Don't intercept keys when a modal/dialog is open or focus is in an input
-		if (this.isFocusInModal(evt)) return;
+		if (isFocusInModal(evt, doc)) return;
 
-		const view = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-		if (!view || view.getMode() !== 'preview') return;
-		if (!this.isVimModeEnabled()) return;
+		const view = getPreviewViewIn(this.plugin.app, doc);
+		if (!view) return;
+		if (!isVimModeEnabled(this.plugin.app)) return;
 
-		const scrollEl = this.getScrollElement(view);
+		const scrollEl = getScrollElement(view);
 		if (!scrollEl) return;
 
 		const { key, ctrlKey, metaKey, altKey } = evt;
@@ -84,30 +85,6 @@ export class ReadingModeScrollHandler {
 
 	private scrollHalfPage(scrollEl: HTMLElement, direction: 1 | -1): void {
 		scrollEl.scrollTop += direction * (scrollEl.clientHeight / 2);
-	}
-
-	private isFocusInModal(evt: KeyboardEvent): boolean {
-		const target = evt.target as HTMLElement;
-		// Yield to any focused input-like element
-		if (
-			target.tagName === 'INPUT' ||
-			target.tagName === 'TEXTAREA' ||
-			target.tagName === 'SELECT' ||
-			target.isContentEditable
-		) return true;
-		// Yield to Obsidian modals, prompts, and suggestion dropdowns
-		if (target.closest('.modal-container, .prompt, .suggestion-container')) return true;
-		// Yield if any modal overlay is currently visible in the DOM
-		if (activeDocument.querySelector('.modal-container')) return true;
-		return false;
-	}
-
-	private isVimModeEnabled(): boolean {
-		return (this.plugin.app.vault as VaultWithConfig).getConfig('vimMode') === true;
-	}
-
-	private getScrollElement(view: MarkdownView): HTMLElement | null {
-		return view.containerEl.querySelector<HTMLElement>('.markdown-preview-view');
 	}
 
 	private getLineHeight(scrollEl: HTMLElement): number {

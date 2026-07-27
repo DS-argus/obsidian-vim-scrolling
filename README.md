@@ -76,15 +76,21 @@ This ensures the editor opens with the cursor near the content you were reading.
 3. Open any note and switch to **Reading mode** (the book icon in the top-right, or via the command palette).
 4. Use `j`/`k`, `Ctrl+D`/`Ctrl+U`, `gg`, and `G` to navigate.
 
-## Installation (build from source)
+## Installation
 
-This is a personal fork and is **not** published to the Obsidian community store, so install it by building locally and copying the output into your vault.
+### From the community store (recommended)
 
-### Prerequisites
+Install [**Vim Reading Navigation**](https://community.obsidian.md/plugins/vim-reading-nav) from **Settings → Community plugins → Browse**, or use the "Add to Obsidian" button on the store page.
+
+### From source
+
+To build the latest development version yourself:
+
+#### Prerequisites
 
 - [Node.js](https://nodejs.org) 18+ and npm
 
-### 1. Build
+#### 1. Build
 
 ```bash
 git clone https://github.com/DS-argus/vim-reading-nav
@@ -95,7 +101,7 @@ npm run build        # type-checks, then bundles src/ → main.js
 
 This produces `main.js` at the repo root. The three files Obsidian needs are `main.js`, `manifest.json`, and `styles.css`.
 
-### 2. Copy into your vault
+#### 2. Copy into your vault
 
 Create the plugin folder if it doesn't exist, then copy the three artifacts in.
 
@@ -113,11 +119,11 @@ Copy-Item main.js,manifest.json,styles.css "<Vault>\.obsidian\plugins\vim-readin
 
 > `.obsidian` is a hidden folder. The plugin folder name must match the plugin `id` (`vim-reading-nav`).
 
-### 3. Enable
+#### 3. Enable
 
 Reload Obsidian (`Reload app without saving` from the command palette), then enable **Vim Reading Navigation** under **Settings → Community plugins**.
 
-### Live development
+#### Live development
 
 ```bash
 npm run dev   # watch mode — recompiles main.js on save

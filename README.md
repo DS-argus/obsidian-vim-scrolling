@@ -2,7 +2,7 @@
 
 An Obsidian plugin that brings vim-style **scrolling** and [Vimium](https://github.com/philc/vimium)-style **link hints** to **reading mode** when Obsidian's vim key bindings are enabled.
 
-> A personal fork of [xlongfeng/obsidian-vim-scrolling](https://github.com/xlongfeng/obsidian-vim-scrolling) that adds plain `d`/`u` half-page scrolling and an `f` link hint mode. Not published to the community store — see [Installation](#installation-build-from-source) and [Credits](#credits).
+> A fork of [xlongfeng/obsidian-vim-scrolling](https://github.com/xlongfeng/obsidian-vim-scrolling) that adds plain `d`/`u` half-page scrolling, an `f` link hint mode, and pop-out window support. Published with the original author's approval — see [Credits](#credits).
 
 ## Design Idea
 
@@ -131,5 +131,8 @@ A fork of [**obsidian-vim-scrolling**](https://github.com/xlongfeng/obsidian-vim
 
 - Plain `d` / `u` for half-page scrolling (alongside `Ctrl+D` / `Ctrl+U`)
 - An `f` Vimium-style link hint mode with hover preview and link activation
+- Pop-out window support
+
+Published to the community plugin directory with the original author's [explicit approval](https://github.com/xlongfeng/obsidian-vim-scrolling/issues/2#issuecomment-5088284571), per Obsidian's [fork policy](https://docs.obsidian.md/Developer+policies#Forks).
 
 Distributed under the same [0BSD license](LICENSE) as the original.

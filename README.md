@@ -87,7 +87,7 @@ This is a personal fork and is **not** published to the Obsidian community store
 ### 1. Build
 
 ```bash
-git clone https://github.com/DS-argus/obsidian-vim-scrolling vim-reading-nav
+git clone https://github.com/DS-argus/vim-reading-nav
 cd vim-reading-nav
 npm install
 npm run build        # type-checks, then bundles src/ → main.js

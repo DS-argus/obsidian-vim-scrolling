@@ -11,7 +11,7 @@ Thank you for considering contributing! This document covers everything you need
 ## Setting up the development environment
 
 ```bash
-git clone https://github.com/DS-argus/obsidian-vim-scrolling vim-reading-nav
+git clone https://github.com/DS-argus/vim-reading-nav
 cd vim-reading-nav
 npm install
 ```

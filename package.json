@@ -5,7 +5,7 @@
 	"main": "main.js",
 	"type": "module",
 	"author": "argus",
-	"homepage": "https://github.com/DS-argus/obsidian-vim-scrolling",
+	"homepage": "https://github.com/DS-argus/vim-reading-nav",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
